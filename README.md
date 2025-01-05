@@ -2,6 +2,8 @@
 
 A Bible reader application with text-to-speech functionality and read verses tracking, designed to help you finally finish the Bible.
 
+![Bible Reader GUI](https://i.imgur.com/vqhyUKy.png)
+
 ## Features
 - **Text-to-Speech:** Read verses aloud with high-quality text-to-speech.
 - **Verse Tracking:** Mark verses as read and keep track of your reading progress.
