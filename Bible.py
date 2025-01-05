@@ -235,6 +235,17 @@ class BibleApp(tk.Tk):
         else:
             self.config.read(self.config_file)
 
+            # Ensure the 'Settings' section exists
+            if 'Settings' not in self.config:
+                self.config['Settings'] = {}
+
+            # Check if the 'Translation' key exists in the 'Settings' section
+            if 'Translation' not in self.config['Settings']:
+                # If not, add it with the default value
+                self.config['Settings']['Translation'] = self.default_translation
+                with open(self.config_file, 'w') as configfile:
+                    self.config.write(configfile)
+
         self.voice = self.config['Settings']['Voice']
         self.skip_read_verses = self.config['Settings'].getboolean('SkipReadVerses')
         self.text_size = self.config['Settings'].getint('TextSize')
@@ -343,20 +354,20 @@ class BibleApp(tk.Tk):
         if new_translation != self.current_translation:
             self.save_notes()  # Save current notes
             self.current_translation = new_translation
-            
+
             # Update config
             self.config['Settings']['Translation'] = self.current_translation
             with open(self.config_file, 'w') as configfile:
                 self.config.write(configfile)
-            
+
             # Update read verses file path
             old_verses_file = self.read_verses_file
             self.read_verses_file = f"read_verses_{self.current_translation.split('.')[0]}.csv"
-            
+
             # Load new translation data
             self.load_bible_data()
             self.load_storage_files()
-            
+
             # Reset to Genesis 1:1
             self.book_var.set("Genesis")
             self.update_chapters()
@@ -481,13 +492,13 @@ class BibleApp(tk.Tk):
 
             # Get all chapters for the selected book
             chapters = sorted(self.bible_data[self.bible_data["Book Number"] == book_number]["Chapter"].unique())
-            
+
             # Update chapter dropdown
             self.chapter_dropdown['values'] = chapters
             if chapters:
                 self.chapter_var.set(str(chapters[0]))  # Set to first chapter
                 self.update_verses()  # Update verses for the selected chapter
-            
+
             self.navigate()
         except Exception as e:
             print(f"Error updating chapters: {e}")
@@ -515,7 +526,7 @@ class BibleApp(tk.Tk):
             self.verse_dropdown['values'] = verses
             if verses:
                 self.verse_var.set(str(verses[0]))  # Set to first verse
-            
+
             self.navigate()
         except Exception as e:
             print(f"Error updating verses: {e}")
