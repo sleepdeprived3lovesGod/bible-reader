@@ -697,7 +697,7 @@ class BibleApp(tk.Tk):
         """Reset all history, notes, and settings to their defaults with confirmation."""
         confirmation = messagebox.askyesno(
             "Reset All",
-            "THIS IRREVERSIBLE ACTION WILL RESET ALL HISTORY AND SETTINGS TO THEIR DEFAULTS.\n\nYOU CANNOT GET YOUR NOTES BACK."
+            "THIS IRREVERSIBLE ACTION WILL RESET ALL HISTORY AND SETTINGS TO THEIR DEFAULTS."
         )  # Ask for confirmation
         if confirmation:
             # Reset read verses
