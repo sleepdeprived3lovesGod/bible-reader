@@ -127,7 +127,7 @@ class BibleApp(tk.Tk):
         self.translation_dropdown.bind('<<ComboboxSelected>>', self.update_translation)
         self.translation_dropdown.bind('<FocusIn>', lambda e: self.save_notes())
 
-        # Text size controls
+        # Text Size controls
         size_frame = tk.Frame(control_frame)
         size_frame.grid(row=0, column=2, padx=10)
 
@@ -141,24 +141,24 @@ class BibleApp(tk.Tk):
         ttk.Button(size_frame, text="-", command=lambda: self.change_text_size(-1), style='Square.TButton', width=2).grid(row=0, column=1, padx=2)
         ttk.Button(size_frame, text="+", command=lambda: self.change_text_size(1), style='Square.TButton', width=2).grid(row=0, column=2, padx=2)
 
-        # Skip read verses checkbox
+        # Add Skip read verses checkbox
         self.skip_read_verses = tk.BooleanVar(value=self.skip_read_verses)
         self.skip_checkbox = ttk.Checkbutton(control_frame, text="Skip read verses",
-                                        variable=self.skip_read_verses)
-        self.skip_checkbox.grid(row=0, column=3, padx=10)  # Changed from column=2 to column=3
+                                            variable=self.skip_read_verses)
+        self.skip_checkbox.grid(row=0, column=4, padx=10)  # Changed from column=2 to column=3
 
         # Reset buttons
         reset_frame = tk.Frame(control_frame)
-        reset_frame.grid(row=0, column=4, padx=10)  # Changed from column=3 to column=4
+        reset_frame.grid(row=0, column=5, padx=10)  # Changed from column=3 to column=4
 
         ttk.Button(reset_frame, text="Reset Chapter History",
-                 command=self.reset_chapter_history).grid(row=0, column=0, padx=5)
-        ttk.Button(reset_frame, text="Reset Chapter Notes",
-                 command=self.reset_chapter_notes).grid(row=0, column=1, padx=5)
+                    command=self.reset_chapter_history).grid(row=0, column=0, padx=5)
+        # ttk.Button(reset_frame, text="Reset Chapter Notes",
+        #              command=self.reset_chapter_notes).grid(row=0, column=1, padx=5)
         ttk.Button(reset_frame, text="Reset Preferences",
-                 command=self.reset_preferences).grid(row=0, column=2, padx=5)
+                    command=self.reset_preferences).grid(row=0, column=1, padx=5)
         ttk.Button(reset_frame, text="Reset All",
-                 command=self.reset_all).grid(row=0, column=3, padx=5)
+                    command=self.reset_all).grid(row=0, column=2, padx=5)
 
         # === Verse Display ===
         self.verse_display = tk.Text(self, height=20, wrap=tk.WORD)
@@ -617,7 +617,7 @@ class BibleApp(tk.Tk):
     def change_text_size(self, delta):
         """Change the font size of the verse display and save to config."""
         new_size = self.text_size.get() + delta
-        if 8 <= new_size <= 24:  # Limit size range
+        if 8 <= new_size <= 48:  # Increase max size to 48
             self.text_size.set(new_size)
             self.verse_display.configure(font=("TkDefaultFont", new_size))  # Update the font size
             self.config['Settings']['TextSize'] = str(new_size)
@@ -697,17 +697,13 @@ class BibleApp(tk.Tk):
         """Reset all history, notes, and settings to their defaults with confirmation."""
         confirmation = messagebox.askyesno(
             "Reset All",
-            "THIS IRREVERSIBLE ACTION WILL RESET ALL HISTORY, NOTES AND SETTINGS TO THEIR DEFAULTS.\n\nYOU CANNOT GET YOUR NOTES BACK."
+            "THIS IRREVERSIBLE ACTION WILL RESET ALL HISTORY AND SETTINGS TO THEIR DEFAULTS.\n\nYOU CANNOT GET YOUR NOTES BACK."
         )  # Ask for confirmation
         if confirmation:
             # Reset read verses
             self.read_verses = []
             with open(self.read_verses_file, "w") as f:
                 f.write("Verse ID\n")
-
-            # Reset notes
-            self.notes = pd.DataFrame(columns=["Book Number", "Chapter", "Notes"])
-            self.notes.to_csv(self.notes_file, index=False)
 
             # Reset settings to defaults
             self.config['Settings'] = {
@@ -838,6 +834,11 @@ class BibleApp(tk.Tk):
 
         # Update the display to show the verse as read
         self.navigate()
+
+        # Disable dropdowns
+        self.book_dropdown.config(state="disabled")
+        self.chapter_dropdown.config(state="disabled")
+        self.verse_dropdown.config(state="disabled")
 
         # Start new reading in a separate thread
         threading.Thread(target=self.speak_text, args=(text_to_speak,)).start()
@@ -1062,6 +1063,9 @@ class BibleApp(tk.Tk):
             self.audio_paused = True
             self.read_button.config(state="normal")  # Re-enable the Read button
             self.next_unread_button.config(state="normal")  # Re-enable the Next Unread button
+            self.book_dropdown.config(state="readonly")  # Re-enable the Book dropdown
+            self.chapter_dropdown.config(state="readonly")  # Re-enable the Chapter dropdown
+            self.verse_dropdown.config(state="readonly")  # Re-enable the Verse dropdown
 
     def resume(self):
         """Resume paused audio playback."""
